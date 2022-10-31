@@ -1,0 +1,124 @@
+#
+# A couple of useful guides & docs:
+#
+# - Main Bitrise CLI docs: https://github.com/bitrise-io/bitrise/tree/master/_docs
+# - Step Development Guideline: https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+# - Bitrise.yml format spec: https://github.com/bitrise-io/bitrise/blob/master/_docs/bitrise-yml-format-spec.md
+# - Bitrise docs: http://devcenter.bitrise.io/
+# - Bitrise CLI guides: http://devcenter.bitrise.io/bitrise-cli/
+
+title: |-
+  Calculate Code Coverage Report
+summary: |
+  Run coverage report for Xcode test results using Slather
+description: |
+  This step will create code covereage reports using slather
+website: https://github.com/dearestpankaj/VivyTeam/vivy-ios/bitrise-step-calculate-code-coverage-report
+source_code_url: https://github.com/dearestpankaj/VivyTeam/vivy-ios/bitrise-step-calculate-code-coverage-report
+support_url: https://github.com/dearestpankaj/VivyTeam/vivy-ios/bitrise-step-calculate-code-coverage-report/issues
+
+# If this step should be available only for certain project types
+# just uncomment this `project_type_tags` section and include all the
+# project types supported by the step. If the step can be used for all
+# project types then you can just remove this section.
+# If no `project_type_tags` specified (or specified as an empty array)
+# that means the step can be used for any project type.
+# You can find more information about project type tags in the Step Development Guideline:
+# https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+#
+# project_type_tags:
+#   - ios
+#   - macos
+#   - android
+#   - xamarin
+#   - react-native
+#   - cordova
+#   - ionic
+#   - flutter
+
+# Type tags are used for categorizing steps, for easier step discovery in Step Libraries.
+# You can find more information about type tags in the Step Development Guideline:
+# https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+type_tags:
+  - test
+
+# These properties define whether a Step is run in a given Workflow or not.
+# You can find more information about this in the documentation here:
+# https://devcenter.bitrise.io/en/steps-and-workflows/developing-your-own-bitrise-step/developing-a-new-step.html#setting-conditions-for-running-the-step
+#
+is_requires_admin_user: true
+is_always_run: false
+is_skippable: false
+run_if: ""
+
+# Use the `deps` property to declare dependencies that you can fetch from an OS dependency manager.
+# You can find more information about this in the documentation here:
+# https://devcenter.bitrise.io/en/steps-and-workflows/developing-your-own-bitrise-step/developing-a-new-step.html#submodules-and-step-dependencies
+#
+deps:
+  brew:
+  - name: git
+  - name: ruby
+  apt_get:
+  - name: git
+  - name: ruby
+
+
+toolkit:
+  bash:
+    entry_file: step.sh
+
+
+inputs:
+  - source_dir_path: $BITRISE_COVERAGE_SOURCE_DIR
+    opts:
+      title: "Source directory"
+      summary: Relative path to the sources directory that is being covered.
+      description: |
+        Relative path to the sources directory that is being covered.
+      is_required: true
+  - project: $BITRISE_XCODEPROJ_PATH
+    opts:
+      title: "Project Path"
+      summary: Relative path to the Xcode project.
+      description: |
+        Relative path to the Xcode project.
+      is_required: true
+  - workspace: $BITRISE_PROJECT_PATH
+    opts:
+      title: "Workspace Path"
+      summary: Relative path to the Xcode workspace.
+      description: |
+        Relative path to the Xcode workspace.
+      is_required: true
+  - scheme: $BITRISE_SCHEME
+    opts:
+      title: "Scheme"
+      summary: The Xcode scheme to generate coverage for.
+      description: |
+        The Xcode scheme to generate coverage for
+      is_required: true
+  - tested_product_name: $BITRISE_TESTED_PRODUCT_NAME
+    opts:
+      title: "Product to test"
+      summary: The product name for the framework or binary.
+      description: |
+        This is the product name for the binary that we want to generate coverage for. For example,
+        If your project has both an example project application product, as well as a framework product,
+        You want to specify the name of the framework product here.
+      is_required: true
+  - output_dir_path: $BITRISE_SLATHER_OUTPUT_DIR
+    opts:
+      title: "Output directory"
+      summary: Relative path to the directory where HTML results should be generated.
+      description: |
+        Relative path to the directory where HTML results should be generated.
+      is_required: true
+
+outputs:
+  - BITRISE_SLATHER_HTML_PATH:
+    opts:
+      title: "HTML Report URL"
+      summary: The file url to the index.html file.
+      description: |
+        The file url to the index.html file for this coverage report
